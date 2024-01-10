@@ -1,0 +1,193 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            height: 100px;
+            width: 300px;
+        }
+        .result-section,
+        .roi-section {
+            flex: 0 0 48%;
+            margin-bottom: 1rem;
+        }
+        .text-section {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">ANPR</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Search Form -->
+        <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'user_profile' %}">profile</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">logout</a>
+                </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="jumbotron mt-4">
+            <h1 class="display-4">The ANPR System</h1>
+            <p class="lead">Drag and drop an image or click to upload and automatically detect and recognize the number plate.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'predict' %}" class="mt-4">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="image">Upload Image:</label>
+                <input type="file" class="form-control-file" name="image" accept="image/*" required onchange="previewImage(this);">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+        <div id="drop-area" class="mt-4" ondragover="handleDragOver(event);" ondrop="handleDrop(event);">
+            <form method="post" enctype="multipart/form-data" action="{% url 'predict' %}">
+                {% csrf_token %}
+                <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;" onchange="previewImage(this);">
+                <label for="imageInput">Drag &amp; Drop or click to select an image</label>
+            </form>
+        </div>
+
+        <div id="imagePreview" class="mt-4" style="display: none;">
+            <h2>Preview Section</h2>
+            <img id="preview" src="#" alt="Uploaded Image" class="img-fluid mt-3">
+        </div>
+
+        {% if original_image_base64 %}
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="result-section">
+                        <h2>Original Image</h2>
+                        <img src="data:image/png;base64,{{ original_image_base64 }}" alt="Original Image" class="img-fluid mt-3">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="result-section">
+                        <h2>Normalized Image</h2>
+                        <img src="data:image/png;base64,{{ normalized_image_base64 }}" alt="Result Image" class="img-fluid mt-3">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="result-section">
+                        <h2>Localisation</h2>
+                        <img src="data:image/png;base64,{{ normalized_image_with_bbx_base64 }}" alt="Result Image" class="img-fluid mt-3">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="result-section">
+                        <h2>Object Detection</h2>
+                        <img src="data:image/png;base64,{{ original_copy_with_bbx_base64 }}" alt="Result Image" class="img-fluid mt-3">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="roi-section">
+                        <h2>ROI</h2>
+                        <img src="data:image/png;base64,{{ roi_image_base64 }}" alt="ROI Image" class="img-fluid mt-3">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="container text-section mt-4">
+                        <h2>ROI Text</h2>
+                        <ul>
+                            {% for ocr_result in ocr_results %}
+                                <li>{{ ocr_result }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+        
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'inactivity-check.js' %}"></script>
+
+    <script>
+        function handleDragOver(event) {
+            event.preventDefault();
+            var dropArea = document.getElementById('drop-area');
+            dropArea.classList.add('bg-light');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            var dropArea = document.getElementById('drop-area');
+            dropArea.classList.remove('bg-light');
+
+            var fileInput = document.getElementById('imageInput');
+            var files = event.dataTransfer.files;
+
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+
+        function previewImage(input) {
+            var preview = document.getElementById('preview');
+            var previewContainer = document.getElementById('imagePreview');
+            var file = input.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                previewContainer.style.display = null;
+            }
+        }
+    </script>
+</body>
+</html>

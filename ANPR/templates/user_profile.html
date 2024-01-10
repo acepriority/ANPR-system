@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="container mt-4" id="user-content">
+        <h2>User Profile</h2>
+        <div class="row">
+            <div class="col-md-2">
+                <img src="{% static 'images/PhR0EQA__400x400.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle">
+                <img src="data:image/png;base64,{{ base64_image_data }}" alt="QR Code" class="img-fluid">
+            </div>
+            <div class="col-md-3">
+                <p><strong>First Name:</strong> {{user.first_name}}</p>
+                <p><strong>Last Name:</strong> {{user.last_name}}</p>
+                <p><strong>Police Number:</strong> {{user.usersprofile.police_id}}</p>
+                <p><strong>Email:</strong> {{user.email}}</p>
+                <p><strong>Position:</strong> {{user.usersprofile.position}}</p>
+                <p><strong>Date of Birth:</strong> {{user.usersprofile.dob}}</p>
+                <p><strong>Contact:</strong> {{user.usersprofile.contact}}</p>
+                <p><strong>District:</strong> {{user.usersprofile.district}}</p>
+                <p><strong>County:</strong> {{user.usersprofile.county}}</p>
+                <p><strong>Parish:</strong> {{user.usersprofile.parish}}</p>
+                <p><strong>Village:</strong> {{user.usersprofile.village}}</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.js"></script>
+    <script>
+        function downloadAsPDF() {
+            const userContent = document.getElementById('user-content');
+
+            const options = {
+                margin: 10,
+                filename: 'user_profile.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf(userContent, options);
+        }
+    </script>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-success" onclick="downloadAsPDF()">Download as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <form action="{% url 'password_reset' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Reset Password</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -21,7 +21,6 @@ Notes:
 
 
 
-
 from fastapi import HTTPException
 import cv2
 import PIL
@@ -43,3 +42,5 @@ class ImageReader:
         except (PIL.UnidentifiedImageError, cv2.error) as e:
             logging.error(f"Error reading image: {str(e)}")
             raise HTTPException(status_code=400, detail="Invalid image format")
+
+            ww_r4UWn5@%2z4A

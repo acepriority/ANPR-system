@@ -15,7 +15,6 @@ Attributes:
 
 
 
-
 class Constants:
     def __init__(self, model_path, image_shape, original_image_path, normalized_image_path,
                  normalized_image_with_bbx_path, original_image_with_bbx_path, roi_image_path):
@@ -26,14 +25,3 @@ class Constants:
         self.normalized_image_with_bbx_path = normalized_image_with_bbx_path
         self.original_image_with_bbx_path = original_image_with_bbx_path
         self.roi_image_path = roi_image_path
-
-
-constants = Constants(
-    model_path=r'C:\Users\T480\Desktop\anpr\anpr_model.h5',
-    image_shape=(224, 224),
-    original_image_path="original_image.png",
-    normalized_image_path="normalized_image.png",
-    normalized_image_with_bbx_path="normalized_image_bbx.png",
-    original_image_with_bbx_path="original_image_bbx.png",
-    roi_image_path="roi_image.png"
-)

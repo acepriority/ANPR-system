@@ -19,7 +19,6 @@ Notes:
 
 
 
-
 import tensorflow as tf
 
 

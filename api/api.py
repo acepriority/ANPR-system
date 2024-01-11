@@ -23,7 +23,6 @@ Raises:
 
 
 
-
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import base64
@@ -42,7 +41,7 @@ from constants import Constants
 
 
 constants = Constants(
-    model_path=r'C:\Users\T480\Desktop\anpr\anpr_model.h5',
+    model_path=r'"C:\Users\HP\Desktop\saved_model\sys_model.h5"',
     image_shape=(224, 224),
     original_image_path="original_image.png",
     normalized_image_path="normalized_image.png",
@@ -98,11 +97,13 @@ async def predict(file: UploadFile = File(...)):
         logging.info(f"Input ROI Image size: {roi_image.size}")
         logging.info(f"OCR Result: {ocr_result}")
 
+        """
         cv2.imwrite(constants.original_image_path, cv2.cvtColor(original_image, cv2.COLOR_RGB2BGR))
         cv2.imwrite(constants.normalized_image_path, cv2.cvtColor(normalized_image, cv2.COLOR_RGB2BGR))
         cv2.imwrite(constants.normalized_image_with_bbx_path, cv2.cvtColor(normalized_image_with_bbx, cv2.COLOR_RGB2BGR))
         cv2.imwrite(constants.original_image_with_bbx_path, cv2.cvtColor(original_image_with_bbx, cv2.COLOR_RGB2BGR))
         cv2.imwrite(constants.roi_image_path, cv2.cvtColor(roi_image, cv2.COLOR_RGB2BGR))
+        """
 
         original_image_base64 = base64.b64encode(cv2.imencode('.png', original_image)[1].tobytes()).decode('utf-8')
         normalized_image_base64 = base64.b64encode(cv2.imencode('.png', normalized_image)[1].tobytes()).decode('utf-8')
@@ -119,7 +120,7 @@ async def predict(file: UploadFile = File(...)):
             "ocr_results": ocr_result
         }
     except HTTPException as http_exc:
-        raise http_exc 
+        raise http_exc
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

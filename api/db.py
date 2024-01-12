@@ -1,3 +1,44 @@
+"""
+This module provides CRUD (Create, Read, Update, Delete) operations for managing plates.
+
+def get_plate(number_plate: str):
+    Retrieve all plates.
+
+    Returns:
+        List[dict]: List of plates.
+
+def get_plate(number_plate: str):
+    Retrieve a specific plate by its number plate.
+
+    Args:
+        number_plate (str): The number plate to retrieve.
+
+    Returns:
+        dict: The plate information.
+
+def insert_plate(plate: PlatesSchema):
+    Insert a new plate.
+
+    Args:
+        plate (PlatesSchema): The plate information to insert.
+
+    Returns:
+        dict: The inserted plate information.
+
+def delete_plate(number_plate: str):
+    Delete a plate by its number plate.
+
+    Args:
+        number_plate (str): The number plate to delete.
+
+    Returns:
+        dict: A message indicating the deletion status.
+"""
+
+
+
+
+
 from fastapi import FastAPI, HTTPException, status
 from supabase import create_client, Client
 from pydantic import BaseModel
@@ -12,6 +53,7 @@ class PlatesSchema(BaseModel):
     number_plate: str
 
 app = FastAPI()
+
 @app.get("/plates/")
 def get_all_plates():
     try:
@@ -35,5 +77,5 @@ def insert_plate(plate: PlatesSchema):
 
 @app.delete("/plates/{number_plate}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_plate(number_plate: str):
-    plate =supabase.table("todos").delete().eq("number_plate", number_plate).execute()
+    plate = supabase.table("plates").delete().eq("number_plate", number_plate).execute()
     return {"msg": "Deleted"}

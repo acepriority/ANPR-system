@@ -79,7 +79,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sudaicejeymack@gmail.com'
-EMAIL_HOST_PASSWORD = 'eskg uaxe bvtb miwr'
+EMAIL_HOST_PASSWORD = '*********************'
 
 WSGI_APPLICATION = 'ANPR.wsgi.application'
 

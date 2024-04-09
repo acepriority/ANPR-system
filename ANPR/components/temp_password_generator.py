@@ -11,8 +11,8 @@ class TempPasswordGenerator:
 
     def __init__(
             self,
-            sender_email='sudaicejeymack@gmail.com',  # os.environ['EMAIL_ADDRESS']
-            password='eskg uaxe bvtb miwr'  # os.environ['EMAIL_PASSWORD']
+            os.environ['EMAIL_ADDRESS']
+            os.environ['EMAIL_PASSWORD']
             ):
         self.sender_email = sender_email
         self.password = password
